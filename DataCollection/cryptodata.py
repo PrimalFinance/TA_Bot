@@ -35,10 +35,9 @@ class CryptoData:
     def set_daily_data(self, all_data:bool=True, limit:int=1, aggregate:int=1, exchange:str = ''):
         '''
         all_data: If "True" all data will be requested.
-        limit: limit the amount of data retrieved.
+        limit: Control the number of records recieved. Max of 1,000.
         
-        exchange: exchange to retrieve data from.
-        time_delta: The length of the candle.  '''
+        exchange: exchange to retrieve data from.'''
         
         
         url = f'https://min-api.cryptocompare.com/data/histoday?fsym={self.ticker}&tsym={self.market}&limit={limit}&aggregate={aggregate}'
