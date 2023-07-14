@@ -107,21 +107,24 @@ class CryptoData:
     '''------------------------------------ Strategies ------------------------------------'''
     def find_spikes(self, df: pd.DataFrame, spike_sensitivity:float=20) -> pd.DataFrame:
         
-
+        spikes = []
         index = 0 
         for i in df.iterrows():
             if index == 0:
                 pass
             else:
+                # Get the current row and the previous row.
                 cur_candle = df.iloc[index]
                 prev_candle = df.iloc[index-1]
-
+                # Compare the percentage change between the closing prices of the current and previous candle. 
                 pct_change = ((cur_candle['close'] / prev_candle['close']) - 1) * 100
-                print(f"-----------------------------\nCur: {cur_candle['close']}\nPrev: {prev_candle['close']}\nPCT: {pct_change}\n")
+                # If the percentage change calculated is higher than 'spike_sensitivity' it will be added to the list. 
+                if pct_change > spike_sensitivity:
+                    spikes.append(i)
                 
-            
-
             index += 1
+        
+        return spikes
     '''------------------------------------'''
     '''------------------------------------'''
     '''------------------------------------'''
