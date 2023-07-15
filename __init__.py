@@ -1,5 +1,3 @@
-from DataCollection.assetdata import AssetData
-
 from DataCollection.cryptodata import CryptoData
 
 
@@ -11,6 +9,7 @@ def __init__():
     market = "USD"
     exchange = "Kraken"
 
+    # Create 'CryptoData' object and assign relevant variables. 
     cd = CryptoData(ticker=ticker, market=market, exchange=exchange)
     
     data = cd.get_hourly_data(limit=1000, aggregate=1)
