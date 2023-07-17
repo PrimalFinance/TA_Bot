@@ -35,9 +35,10 @@ class CryptoData:
     def set_daily_data(self, all_data:bool=True, limit:int=1, aggregate:int=1, exchange:str = ''):
         '''
         all_data: If "True" all data will be requested.
-        limit: Control the number of records recieved. Max of 1,000.
+        limit: limit the amount of data retrieved.
         
-        exchange: exchange to retrieve data from.'''
+        exchange: exchange to retrieve data from.
+        time_delta: The length of the candle.  '''
         
         
         url = f'https://min-api.cryptocompare.com/data/histoday?fsym={self.ticker}&tsym={self.market}&limit={limit}&aggregate={aggregate}'
@@ -49,9 +50,8 @@ class CryptoData:
 
         page = requests.get(url)
         data = page.json()['Data']
-        df = pd.Dataframe(data)
-
-        df['time'] = [dt.datetime.fromtimestamp(d) for d in df.time]
+        df = pd.DataFrame(data)
+        df = self.format_dataframe(df=df)
         self.daily_data = df
 
     '''------------------------------------'''
@@ -78,9 +78,8 @@ class CryptoData:
         data = page.json()['Data']
         df = pd.DataFrame(data)
         # Format timestamps to dates.
-        df['time'] = [dt.datetime.fromtimestamp(d) for d in df.time]
+        df = self.format_dataframe(df=df)
         self.hourly_data = df
-
 
     '''------------------------------------'''
     def get_hourly_data(self, limit:int=1, aggregate:int=1, exchange:str=''):
@@ -95,7 +94,7 @@ class CryptoData:
         page = requests.get(url)
         data = page.json()['Data']
         df = pd.DataFrame(data)
-        df['time'] = [dt.datetime.fromtimestamp(d) for d in df.time]
+        df = self.format_dataframe(df=df)
         self.minute_data = df
         
     '''------------------------------------'''
@@ -104,7 +103,11 @@ class CryptoData:
             self.set_minute_data(limit=limit, aggregate=aggregate, exchange=exchange)
         return self.minute_data
 
+    
+
+
     '''------------------------------------ Strategies ------------------------------------'''
+    '''------------------------------------'''
     def find_spikes(self, df: pd.DataFrame, spike_sensitivity:float=20) -> pd.DataFrame:
         
         spikes = []
@@ -121,6 +124,7 @@ class CryptoData:
                 # If the percentage change calculated is higher than 'spike_sensitivity' it will be added to the list. 
                 if pct_change > spike_sensitivity:
                     spikes.append(i)
+                    spikes.append(prev_candle)
                 
             index += 1
         
@@ -132,7 +136,10 @@ class CryptoData:
     '''------------------------------------ Utilities ------------------------------------'''
     '''------------------------------------'''
     def format_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
-        pass
+        # Convert timestamps to a readable format. 
+        df['time'] = [dt.datetime.fromtimestamp(d) for d in df.time]
+        #df = df[::-1].reset_index(drop=True)
+        return df
     '''------------------------------------'''
     '''------------------------------------'''
     '''------------------------------------'''
